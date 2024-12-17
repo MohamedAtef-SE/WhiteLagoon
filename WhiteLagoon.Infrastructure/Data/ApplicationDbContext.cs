@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Domain.Entities;
+using WhiteLagoon.Domain.Entities.Identity;
 
 namespace WhiteLagoon.Infrastructure.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -11,10 +13,15 @@ namespace WhiteLagoon.Infrastructure.Data
         }
 
         public DbSet<Villa> Villas { get; set; }
+        public DbSet<VillaNumber> VillaNumbers { get; set; }
+        public DbSet<Amenity> Amenities { get; set; }
+        //public DbSet<ApplicationUser> Users {  get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(modelBuilder);
+
             var Villa01 = new Villa()
             {
                 Id = 1,
@@ -49,6 +56,130 @@ namespace WhiteLagoon.Infrastructure.Data
             };
 
             modelBuilder.Entity<Villa>().HasData(Villa01, Villa02,Villa03);
+
+            // Villa Number Data Seeds
+            var VN101 = new VillaNumber()
+            {
+                VillaId = 1,
+                Villa_Number = 101,
+            };
+            var VN102 = new VillaNumber()
+            {
+                VillaId = 1,
+                Villa_Number = 102,
+            };
+            var VN103 = new VillaNumber()
+            {
+                VillaId = 1,
+                Villa_Number = 103,
+            };
+            var VN201 = new VillaNumber()
+            {
+                VillaId = 2,
+                Villa_Number = 201,
+            };
+            var VN202 = new VillaNumber()
+            {
+                VillaId = 2,
+                Villa_Number = 202,
+            };
+            var VN203 = new VillaNumber()
+            {
+                VillaId = 2,
+                Villa_Number = 203,
+            };
+            var VN301 = new VillaNumber()
+            {
+                VillaId = 3,
+                Villa_Number = 301,
+            };
+            var VN302 = new VillaNumber()
+            {
+                VillaId = 3,
+                Villa_Number = 302,
+            };
+            var VN303 = new VillaNumber()
+            {
+                VillaId = 3,
+                Villa_Number = 303,
+            };
+
+            modelBuilder.Entity<VillaNumber>().HasData(VN101,VN102,VN103,VN201,VN202,VN203,VN301,VN302,VN303);
+
+            modelBuilder.Entity<Amenity>().HasData(
+              new Amenity
+              {
+                  Id = 1,
+                  VillaId = 40,
+                  Name = "Private Pool"
+              }, new Amenity
+              {
+                  Id = 2,
+                  VillaId = 40,
+                  Name = "Microwave"
+              }, new Amenity
+              {
+                  Id = 3,
+                  VillaId = 40,
+                  Name = "Private Balcony"
+              }, new Amenity
+              {
+                  Id = 4,
+                  VillaId = 40,
+                  Name = "1 king bed and 1 sofa bed"
+              },
+
+              new Amenity
+              {
+                  Id = 5,
+                  VillaId = 41,
+                  Name = "Private Plunge Pool"
+              }, new Amenity
+              {
+                  Id = 6,
+                  VillaId = 41,
+                  Name = "Microwave and Mini Refrigerator"
+              }, new Amenity
+              {
+                  Id = 7,
+                  VillaId = 41,
+                  Name = "Private Balcony"
+              }, new Amenity
+              {
+                  Id = 8,
+                  VillaId = 41,
+                  Name = "king bed or 2 double beds"
+              },
+
+              new Amenity
+              {
+                  Id = 9,
+                  VillaId = 42,
+                  Name = "Private Pool"
+              }, new Amenity
+              {
+                  Id = 10,
+                  VillaId = 42,
+                  Name = "Jacuzzi"
+              }, new Amenity
+              {
+                  Id = 11,
+                  VillaId = 42,
+                  Name = "Private Balcony"
+              }, new Amenity
+              {
+                  Id = 12,
+                  VillaId = 43,
+                  Name = "1 king bed and 1 sofa bed"
+              },
+
+              new Amenity
+              {
+                  Id = 13,
+                  VillaId = 43,
+                  Name = "Private Plunge Pool"
+              }
+              );
         }
     }
 }
