@@ -112,6 +112,14 @@ namespace WhiteLagoon.Web.Controllers
                                                    lockoutOnFailure:false);
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+                var adminOnly = await _userManager.IsInRoleAsync(user!, SD.Role_Admin);
+                if (adminOnly)
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
+                    
+
                 TempData["success"] = $"Welcome, {loginViewModel.Email.Split('@')[0]}";
                 if (string.IsNullOrEmpty(loginViewModel.ReturnUrl))
                 {
