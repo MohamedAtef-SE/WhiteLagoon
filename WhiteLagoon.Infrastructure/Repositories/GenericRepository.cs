@@ -12,7 +12,7 @@ namespace WhiteLagoon.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public async Task<IEnumerable<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null)
+        public IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<TEntity> query = _dbContext.Set<TEntity>();
             if (filter != null)
@@ -26,7 +26,7 @@ namespace WhiteLagoon.Infrastructure.Repositories
                     query = query.Include(property);
                 }
             }
-            return await query.ToListAsync();
+            return query;
         }
 
         public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter, string? includeProperties = null)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Web.ViewModels;
@@ -20,7 +21,7 @@ namespace WhiteLagoon.Web.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var villasNumbers = await _villaNumberRepository.GetAllAsync(null,$"Villa");
+            var villasNumbers = await _villaNumberRepository.GetAll(null,$"Villa").ToListAsync();
 
             if(villasNumbers is not null)
                 return View(villasNumbers);
@@ -31,7 +32,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var villaList = await _villaRepository.GetAllAsync();
+            var villaList = await _villaRepository.GetAll().ToListAsync();
 
             VillaNumberVM villaNumberVM = new VillaNumberVM()
             {
@@ -48,7 +49,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(VillaNumberVM villaNumberVM)
         {
-            var villaList = await _villaRepository.GetAllAsync();
+            var villaList = await _villaRepository.GetAll().ToListAsync();
             var villaNumberisExist = await _villaNumberRepository.GetAsync(VN => VN.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
 
             villaNumberVM.VillaList = villaList.Select(V => new SelectListItem()
@@ -93,7 +94,7 @@ namespace WhiteLagoon.Web.Controllers
 
             if (villaNumber is null)
                 return RedirectToAction("Error","Home");
-            var villaList = await _villaRepository.GetAllAsync();
+            var villaList = await _villaRepository.GetAll().ToListAsync();
             VillaNumberVM vm = new VillaNumberVM()
             {
                 VillaNumber = villaNumber,
@@ -138,7 +139,7 @@ namespace WhiteLagoon.Web.Controllers
             if(villaNumber is null)
                 return RedirectToAction("Error","Home");
 
-            var villaList = await _villaRepository.GetAllAsync();
+            var villaList = await _villaRepository.GetAll().ToListAsync();
             VillaNumberVM vm = new VillaNumberVM()
             {
                 VillaNumber = villaNumber,

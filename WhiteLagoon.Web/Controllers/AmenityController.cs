@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application._Common.Utility;
 using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities;
@@ -28,7 +29,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var amenites = await _amenityRepository.GetAllAsync(null, "Villa");
+            var amenites = await _amenityRepository.GetAll(null, "Villa").ToListAsync();
             if(amenites is null)
                 return NotFound();
             var mappedAmenites =_mapper.Map<IEnumerable<AmenityViewModel>>(amenites);
@@ -38,7 +39,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var villas = await _villaRepository.GetAllAsync();
+            var villas = await _villaRepository.GetAll().ToListAsync();
             var amenityViewModel = new AmenityViewModel()
             {
                 Name = "",
@@ -56,7 +57,7 @@ namespace WhiteLagoon.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var villas = await _villaRepository.GetAllAsync();
+                var villas = await _villaRepository.GetAll().ToListAsync();
                 model.VillaList = villas.Select(villa => new SelectListItem()
                 {
                     Text = villa.Name,
@@ -91,7 +92,7 @@ namespace WhiteLagoon.Web.Controllers
                 return NotFound();
 
             var mappedAmenity = _mapper.Map<AmenityViewModel>(amenity);
-            var villas = await _villaRepository.GetAllAsync();
+            var villas = await _villaRepository.GetAll().ToListAsync();
             mappedAmenity.VillaList = villas.Select(villa => new SelectListItem()
             {
                 Text = villa.Name,
@@ -129,7 +130,7 @@ namespace WhiteLagoon.Web.Controllers
             if(amenity is null) return NotFound();
 
             var mappedAmenity = _mapper.Map<AmenityViewModel>(amenity);
-            var villas = await _villaRepository.GetAllAsync();
+            var villas = await _villaRepository.GetAll().ToListAsync();
             mappedAmenity.VillaList = villas.Select(villa => new SelectListItem()
             {
                 Text = villa.Name,

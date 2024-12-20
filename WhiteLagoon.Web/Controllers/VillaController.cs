@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Web.Helpers;
@@ -26,7 +27,7 @@ namespace WhiteLagoon.Web.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var villas = await _villaRepository.GetAllAsync();
+            var villas = await _villaRepository.GetAll().ToListAsync();
             
             var mappedVillas = _mapper.Map<IEnumerable<VillaViewModel>>(villas);
 

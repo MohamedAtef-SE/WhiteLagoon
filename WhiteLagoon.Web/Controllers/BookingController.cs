@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
 using System.Security.Claims;
 using WhiteLagoon.Application._Common.Utility;
@@ -48,7 +49,7 @@ namespace WhiteLagoon.Web.Controllers
 
             var villa = await _villaRepository.GetAsync(v => v.Id == villaId, includeProperties: "Amenities");
 
-           // var mappedVilla = _mapper.Map<VillaViewModel>(villa);
+            // var mappedVilla = _mapper.Map<VillaViewModel>(villa);
             Booking booking = new Booking()
             {
                 UserId = user.Id,
@@ -75,10 +76,10 @@ namespace WhiteLagoon.Web.Controllers
 
             booking.Status = SD.StatusPending;
             booking.BookingDate = DateTime.UtcNow;
-           
-            var villasNumber = await _villaNumberRepository.GetAllAsync();
-            var bookedVillas = await _bookingRepository.GetAllAsync(booking => booking.Status == SD.StatusApproved
-                                                                            || booking.Status == SD.StatusCheckedIn);
+
+            var villasNumber = await _villaNumberRepository.GetAll().ToListAsync();
+            var bookedVillas = await _bookingRepository.GetAll(booking => booking.Status == SD.StatusApproved
+                                                                            || booking.Status == SD.StatusCheckedIn).ToListAsync();
 
 
 
@@ -90,9 +91,9 @@ namespace WhiteLagoon.Web.Controllers
             {
                 TempData["error"] = "Room has been sold out!";
                 // no room available
-                return RedirectToAction(nameof(FinalizeBooking),new 
+                return RedirectToAction(nameof(FinalizeBooking), new
                 {
-                    villaId =booking.VillaId,
+                    villaId = booking.VillaId,
                     checkInDate = booking.CheckInDate,
                     nights = booking.Nights,
                 });
@@ -194,9 +195,9 @@ namespace WhiteLagoon.Web.Controllers
             {
                 var availableVillaNumber = await AssignAvailableVillaNumberByVilla(booking.VillaId);
 
-                booking.VillaNumbers = await _villaNumberRepository.GetAllAsync(u => u.VillaId == booking.VillaId
+                booking.VillaNumbers = await _villaNumberRepository.GetAll(u => u.VillaId == booking.VillaId
                                                                                &&
-                                                                               availableVillaNumber.Any(x => x == u.Villa_Number));
+                                                                               availableVillaNumber.Any(x => x == u.Villa_Number)).ToListAsync();
             }
             //var mappedBooking = _mapper.Map<BookingViewModel>(booking);
             return View(booking);
@@ -237,9 +238,12 @@ namespace WhiteLagoon.Web.Controllers
         {
             List<int> availableVillaNumbers = new();
 
-            var villaNumbers = await _villaNumberRepository.GetAllAsync(vn => vn.VillaId == villaId);
+            var villaNumbers = await _villaNumberRepository.GetAll(vn => vn.VillaId == villaId).ToListAsync();
 
-            var checkedInBookingsForSpecificVilla = await _bookingRepository.GetAllAsync(booking => booking.VillaId == villaId && booking.Status == SD.StatusCheckedIn);
+            var checkedInBookingsForSpecificVilla = await _bookingRepository.GetAll(booking => booking.VillaId == villaId
+                                                                                    &&
+                                                                                    booking.Status == SD.StatusCheckedIn).ToListAsync();
+
             var checkedInVilla = checkedInBookingsForSpecificVilla.Select(u => u.VillaNumber);
 
             foreach (var villaNumber in villaNumbers)
@@ -260,12 +264,12 @@ namespace WhiteLagoon.Web.Controllers
             IEnumerable<Booking> bookings;
             if (User.IsInRole(SD.Role_Admin))
             {
-                bookings = await _bookingRepository.GetAllAsync(booking => booking.Status.ToLower().Equals(status.ToLower()), includeProperties: "User,Villa");
+                bookings = await _bookingRepository.GetAll(booking => booking.Status.ToLower().Equals(status.ToLower()), includeProperties: "User,Villa").ToListAsync();
             }
             else
             {
                 var user = await _userManager.GetUserAsync(User);
-                bookings = await _bookingRepository.GetAllAsync(booking => booking.UserId == user.Id && booking.Status.ToLower().Equals(status.ToLower()), "User,Villa");
+                bookings = await _bookingRepository.GetAll(booking => booking.UserId == user.Id && booking.Status.ToLower().Equals(status.ToLower()), "User,Villa").ToListAsync();
             }
 
             return Json(new { data = bookings });

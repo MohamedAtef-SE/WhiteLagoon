@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using WhiteLagoon.Application._Common.Utility;
 using WhiteLagoon.Application.Interfaces;
@@ -27,7 +28,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var villas = await _villaRepository.GetAllAsync(includeProperties:"Amenities");
+            var villas = await _villaRepository.GetAll(includeProperties:"Amenities").ToListAsync();
             if(villas is null)
                 return NotFound();
 
@@ -46,12 +47,12 @@ namespace WhiteLagoon.Web.Controllers
         public async Task<IActionResult> GetVillasByDate(DateOnly checkInDate, int nights)
         {
             Thread.Sleep(500);
-            var villas = await _villaRepository.GetAllAsync(includeProperties: "Amenities");
+            var villas = await _villaRepository.GetAll(includeProperties: "Amenities").ToListAsync();
             if (villas is null)
                 return NotFound();
-            var villasNumber = await _villaNumberRepository.GetAllAsync();
-            var bookedVillas = await _bookingRepository.GetAllAsync(booking => booking.Status == SD.StatusApproved 
-                                                                            || booking.Status == SD.StatusCheckedIn);
+            var villasNumber = await _villaNumberRepository.GetAll().ToListAsync();
+            var bookedVillas = await _bookingRepository.GetAll(booking => booking.Status == SD.StatusApproved 
+                                                                            || booking.Status == SD.StatusCheckedIn).ToListAsync();
 
             foreach (var villa in villas)
             {
