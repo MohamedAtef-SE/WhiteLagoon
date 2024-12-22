@@ -1,15 +1,12 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities.Identity;
 using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Controllers
 {
-    public class AccountController(IUnitOfWork _unitOfWork,UserManager<ApplicationUser> _userManager, SignInManager<ApplicationUser> _signInManager, RoleManager<IdentityRole> _roleManager,IMapper _mapper) : Controller
+    public class AccountController(UserManager<ApplicationUser> _userManager, SignInManager<ApplicationUser> _signInManager) : Controller
     {
         [HttpGet]
         public IActionResult Register(string? ReturnUrl = null)
@@ -17,12 +14,8 @@ namespace WhiteLagoon.Web.Controllers
             ReturnUrl ??= Url.Content("~/");
             var registerVM = new RegisterVM()
             {
-                ReturnUrl = ReturnUrl,
-                Roles = _roleManager.Roles.Select(role => new SelectListItem()
-                {
-                    Text = role.Name,
-                    Value = role.Name
-                })
+                ReturnUrl = ReturnUrl
+
             };
             return View(registerVM);
         }
@@ -30,13 +23,6 @@ namespace WhiteLagoon.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM registerVM)
         {
-            // in-case return View(registerVM).
-            registerVM.Roles = _roleManager.Roles.Select(role => new SelectListItem()
-            {
-                Text = role.Name,
-                Value = role.Name
-            });
-
             if (!ModelState.IsValid)
                 return View(registerVM);
 
@@ -52,7 +38,7 @@ namespace WhiteLagoon.Web.Controllers
 
             };
 
-            var result = await _userManager.CreateAsync(newUser,registerVM.Password);
+            var result = await _userManager.CreateAsync(newUser, registerVM.Password);
             if (result.Succeeded)
             {
                 TempData["success"] = $"Welcome,{registerVM.Name}";
@@ -63,9 +49,9 @@ namespace WhiteLagoon.Web.Controllers
                 }
                 else
                 {
-                    await _userManager.AddToRoleAsync(newUser,SD.Role_Customer);
+                    await _userManager.AddToRoleAsync(newUser, SD.Role_Customer);
                 }
-                await _signInManager.SignInAsync(newUser,isPersistent: false);
+                await _signInManager.SignInAsync(newUser, isPersistent: false);
 
                 if (string.IsNullOrEmpty(registerVM.ReturnUrl))
                 {
@@ -86,7 +72,7 @@ namespace WhiteLagoon.Web.Controllers
 
                 return View(registerVM);
             }
-            
+
         }
 
         [HttpGet]
@@ -106,10 +92,10 @@ namespace WhiteLagoon.Web.Controllers
         {
             if (!ModelState.IsValid)
                 return View(loginViewModel);
-         var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email,
-                                                   loginViewModel.Password,
-                                                   loginViewModel.RememberMe,
-                                                   lockoutOnFailure:false);
+            var result = await _signInManager.PasswordSignInAsync(loginViewModel.Email,
+                                                      loginViewModel.Password,
+                                                      loginViewModel.RememberMe,
+                                                      lockoutOnFailure: false);
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
@@ -118,7 +104,7 @@ namespace WhiteLagoon.Web.Controllers
                 {
                     return RedirectToAction("Index", "Dashboard");
                 }
-                    
+
 
                 TempData["success"] = $"Welcome, {loginViewModel.Email.Split('@')[0]}";
                 if (string.IsNullOrEmpty(loginViewModel.ReturnUrl))
@@ -138,7 +124,7 @@ namespace WhiteLagoon.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

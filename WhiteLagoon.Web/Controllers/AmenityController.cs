@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
+using WhiteLagoon.Application.Services;
+using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Web.ViewModels;
 
@@ -13,42 +12,29 @@ namespace WhiteLagoon.Web.Controllers
     [Authorize(Roles = SD.Role_Admin)]
     public class AmenityController : Controller
     {
-        private readonly IGenericRepository<Amenity> _amenityRepository;
-        private readonly IGenericRepository<Villa> _villaRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IServiceManager _serviceManager;
         private readonly IMapper _mapper;
 
-        public AmenityController(IUnitOfWork unitOfWork,IMapper mapper)
+        public AmenityController(IServiceManager serviceManager, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _serviceManager = serviceManager;
             _mapper = mapper;
-            _amenityRepository = _unitOfWork.GetGenericRepository<Amenity>();
-            _villaRepository = _unitOfWork.GetGenericRepository<Villa>();
-            
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var amenites = await _amenityRepository.GetAll(null, "Villa").ToListAsync();
-            if(amenites is null)
+            var amenites = await _serviceManager.AmenityServices.GetAmenitiesAsync();
+            if (amenites is null)
                 return NotFound();
-            var mappedAmenites =_mapper.Map<IEnumerable<AmenityViewModel>>(amenites);
+            var mappedAmenites = _mapper.Map<IEnumerable<AmenityViewModel>>(amenites);
             return View(mappedAmenites);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            var villas = await _villaRepository.GetAll().ToListAsync();
-            var amenityViewModel = new AmenityViewModel()
-            {
-                Name = "",
-                VillaList = villas.Select(villa => new SelectListItem()
-                {
-                    Text = villa.Name,
-                    Value = villa.Id.ToString()
-                })
-            };
+            AmenityViewModel amenityViewModel = new();
+
             return View(amenityViewModel);
         }
 
@@ -56,23 +42,15 @@ namespace WhiteLagoon.Web.Controllers
         public async Task<IActionResult> Create(AmenityViewModel model)
         {
             if (!ModelState.IsValid)
-            {
-                var villas = await _villaRepository.GetAll().ToListAsync();
-                model.VillaList = villas.Select(villa => new SelectListItem()
-                {
-                    Text = villa.Name,
-                    Value = villa.Id.ToString()
-                });
                 return View(model);
-            }
-            
-            var mappedAmenity = _mapper.Map<Amenity>(model);
-            var added = await _amenityRepository.AddAsync(mappedAmenity);
 
-            if(!added)
+            var mappedAmenity = _mapper.Map<Amenity>(model);
+            var added = await _serviceManager.AmenityServices.AddAsync(mappedAmenity);
+
+            if (!added)
                 return BadRequest();
 
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
             if (result)
             {
                 TempData["success"] = "Created successfully";
@@ -87,29 +65,25 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int amenityId)
         {
-            var amenity = await _amenityRepository.GetAsync(amenity => amenity.Id == amenityId);
+            var amenity = await _serviceManager.AmenityServices.GetAsync(amenityId);
             if (amenity is null)
                 return NotFound();
 
             var mappedAmenity = _mapper.Map<AmenityViewModel>(amenity);
-            var villas = await _villaRepository.GetAll().ToListAsync();
-            mappedAmenity.VillaList = villas.Select(villa => new SelectListItem()
-            {
-                Text = villa.Name,
-                Value = villa.Id.ToString()
-            });
+
             return View(mappedAmenity);
         }
 
         [HttpPost]
         public async Task<IActionResult> Update(AmenityViewModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return View(model);
             var mappedAmenity = _mapper.Map<Amenity>(model);
-            var updated = _amenityRepository.Update(mappedAmenity);
+
+            var updated = _serviceManager.AmenityServices.Update(mappedAmenity);
             if (!updated) return BadRequest();
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
 
             if (result)
             {
@@ -125,29 +99,24 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int amenityId)
         {
-            var amenity = await _amenityRepository.GetAsync(amenity => amenity.Id == amenityId);   
+            var amenity = await _serviceManager.AmenityServices.GetAsync(amenityId);
 
-            if(amenity is null) return NotFound();
+            if (amenity is null) return NotFound();
 
             var mappedAmenity = _mapper.Map<AmenityViewModel>(amenity);
-            var villas = await _villaRepository.GetAll().ToListAsync();
-            mappedAmenity.VillaList = villas.Select(villa => new SelectListItem()
-            {
-                Text = villa.Name,
-                Value = villa.Id.ToString()
-            });
+
             return View(mappedAmenity);
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(AmenityViewModel model)
         {
-            var amenity =await _amenityRepository.GetAsync(amenity => amenity.Id == model.Id);
+            var amenity = await _serviceManager.AmenityServices.GetAsync(model.Id);
             if (amenity is null) return NotFound();
-            var deleted = _amenityRepository.Delete(amenity);
+            var deleted = _serviceManager.AmenityServices.Delete(amenity);
             if (!deleted) return BadRequest();
 
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
             if (result)
             {
                 TempData["success"] = "Deleted successfully";

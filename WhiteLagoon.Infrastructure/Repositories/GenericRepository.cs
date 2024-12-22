@@ -12,16 +12,24 @@ namespace WhiteLagoon.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null)
+        public IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>>? filter = null, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+            IQueryable<TEntity> query;
+            if (tracked)
+            {
+                query = _dbContext.Set<TEntity>();
+            }
+            else
+            {
+                query = _dbContext.Set<TEntity>().AsNoTracking();
+            }
             if (filter != null)
             {
                 query = query.Where(filter);
             }
             if (!String.IsNullOrEmpty(includeProperties))
             {
-                foreach (var property in includeProperties.Split(",",StringSplitOptions.RemoveEmptyEntries))
+                foreach (var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(property);
                 }
@@ -29,17 +37,25 @@ namespace WhiteLagoon.Infrastructure.Repositories
             return query;
         }
 
-        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter, string? includeProperties = null)
+        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<TEntity> query = _dbContext.Set<TEntity>().Where(filter);
+            IQueryable<TEntity> query;
+            if (tracked)
+            {
+                query = _dbContext.Set<TEntity>().Where(filter);
+            }
+            else
+            {
+                query = _dbContext.Set<TEntity>().Where(filter).AsNoTracking();
+            }
 
             if (!String.IsNullOrEmpty(includeProperties))
             {
                 foreach (var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
-                   query =  query.Include(property);
+                    query = query.Include(property);
                 }
-                
+
             }
             return await query.FirstOrDefaultAsync();
         }
@@ -57,7 +73,7 @@ namespace WhiteLagoon.Infrastructure.Repositories
 
         public bool Delete(TEntity entity)
         {
-           var result = _dbContext.Set<TEntity>().Remove(entity);
+            var result = _dbContext.Set<TEntity>().Remove(entity);
             return result.State == EntityState.Deleted;
         }
 

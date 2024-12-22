@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using WhiteLagoon.Application.DTOs;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Domain.Entities.Identity;
-using WhiteLagoon.Web.DTOs;
 using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Mapping

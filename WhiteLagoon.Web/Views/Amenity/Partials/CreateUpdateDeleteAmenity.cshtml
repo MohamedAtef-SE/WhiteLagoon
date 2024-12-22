@@ -1,4 +1,13 @@
 ﻿@model AmenityViewModel
+@inject IVillaServices villaServices
+@{
+    var villas = await villaServices.GetAllAsync();
+    Model.VillaList = villas.Select(villa => new SelectListItem()
+            {
+                Text = villa.Name,
+                Value = villa.Id.ToString()
+            });
+}
 
 
 <div class="w-100 card border-0 p-4">

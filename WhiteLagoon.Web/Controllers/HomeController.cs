@@ -1,38 +1,19 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
-using WhiteLagoon.Domain.Entities;
-using WhiteLagoon.Web.Models;
+using WhiteLagoon.Application.Services;
+using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(IServiceManager _serviceManager) : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<Villa> _villaRepository;
-        private readonly IGenericRepository<VillaNumber> _villaNumberRepository;
-        private readonly IGenericRepository<Booking> _bookingRepository;
-        private readonly IMapper _mapper;
-        public HomeController(IUnitOfWork unitOfWork,IMapper mapper)
-        {
-            _unitOfWork = unitOfWork;
-            _villaRepository = _unitOfWork.GetGenericRepository<Villa>();
-            _villaNumberRepository = _unitOfWork.GetGenericRepository<VillaNumber>();
-            _bookingRepository = _unitOfWork.GetGenericRepository<Booking>();
-            _mapper = mapper;
-        }
+        
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var villas = await _villaRepository.GetAll(includeProperties:"Amenities").ToListAsync();
+            var villas = await _serviceManager.VillaServices.GetAllAsync();
             if(villas is null)
                 return NotFound();
-
-            //var mappedVillas = _mapper.Map<IEnumerable<VillaViewModel>>(villas);
 
             var homeViewModel = new HomeViewModel()
             {
@@ -47,20 +28,10 @@ namespace WhiteLagoon.Web.Controllers
         public async Task<IActionResult> GetVillasByDate(DateOnly checkInDate, int nights)
         {
             Thread.Sleep(500);
-            var villas = await _villaRepository.GetAll(includeProperties: "Amenities").ToListAsync();
-            if (villas is null)
-                return NotFound();
-            var villasNumber = await _villaNumberRepository.GetAll().ToListAsync();
-            var bookedVillas = await _bookingRepository.GetAll(booking => booking.Status == SD.StatusApproved 
-                                                                            || booking.Status == SD.StatusCheckedIn).ToListAsync();
+            var villas = await _serviceManager.VillaServices.GetVillasByDate(checkInDate, nights);
 
-            foreach (var villa in villas)
-            {
-                int roomsAvailable = SD.VillaRoomsAvailable_Count(villa.Id,villasNumber.ToList(),checkInDate,nights,bookedVillas.ToList());
+           if(villas is null) return BadRequest();
 
-                villa.IsAvailable = roomsAvailable > 0;
-            }
-           // var mappedVillas = _mapper.Map<IEnumerable<VillaViewModel>>(villas);
             HomeViewModel model = new HomeViewModel()
             {
                 CheckInDate = checkInDate,
@@ -69,7 +40,6 @@ namespace WhiteLagoon.Web.Controllers
             };
             return PartialView("Partial/VillaListPartialView", model);
         }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

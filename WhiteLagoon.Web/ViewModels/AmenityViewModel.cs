@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using WhiteLagoon.Domain.Entities;
 
 namespace WhiteLagoon.Web.ViewModels
 {
@@ -9,7 +8,7 @@ namespace WhiteLagoon.Web.ViewModels
     {
         public int Id { get; set; }
         [Required]
-        public required string Name { get; set; }
+        public string Name { get; set; }
         public string? Description { get; set; }
         public int? VillaId { get; set; }
         public string? Villa { get; set; }

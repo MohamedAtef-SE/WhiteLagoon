@@ -1,72 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WhiteLagoon.Application.Interfaces;
-using WhiteLagoon.Domain.Entities;
+using WhiteLagoon.Application.Services;
+using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Controllers
 {
-    public class VillaNumberController : Controller
+    public class VillaNumberController(IServiceManager _serviceManager) : Controller
     {
-        private IGenericRepository<VillaNumber> _villaNumberRepository;
-        private IGenericRepository<Villa> _villaRepository;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public VillaNumberController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-            _villaNumberRepository =  _unitOfWork.GetGenericRepository<VillaNumber>();
-            _villaRepository = _unitOfWork.GetGenericRepository<Villa>();
-        }
         public async Task<IActionResult> Index()
         {
-            var villasNumbers = await _villaNumberRepository.GetAll(null,$"Villa").ToListAsync();
 
-            if(villasNumbers is not null)
-                return View(villasNumbers);
+            var villaNumbers = await _serviceManager.VillaNumberServices.GetAllAsync();
+            if (villaNumbers is not null)
+                return View(villaNumbers);
 
             return BadRequest("No villa numbers found");
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            var villaList = await _villaRepository.GetAll().ToListAsync();
-
-            VillaNumberVM villaNumberVM = new VillaNumberVM()
-            {
-                
-                VillaList = villaList.Select(v => new SelectListItem()
-                {
-                    Text = v.Name,
-                    Value = v.Id.ToString()
-                })
-            };
+            VillaNumberVM villaNumberVM = new();
             return View(villaNumberVM);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(VillaNumberVM villaNumberVM)
         {
-            var villaList = await _villaRepository.GetAll().ToListAsync();
-            var villaNumberisExist = await _villaNumberRepository.GetAsync(VN => VN.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
+            var villaNumberisExist = await _serviceManager.VillaNumberServices.GetAsync(villaNumberVM.VillaNumber.Villa_Number);
 
-            villaNumberVM.VillaList = villaList.Select(V => new SelectListItem()
-            {
-                Text = V.Name,
-                Value = V.Id.ToString()
-            });
             if (villaNumberisExist is { })
             {
-                TempData["error"] = "Villa Number is already exist";  
+                TempData["error"] = "Villa Number is already exist";
                 return View(villaNumberVM);
             }
+
             if (ModelState.IsValid)
             {
-
-                await _villaNumberRepository.AddAsync(villaNumberVM.VillaNumber);
-               var result = await _unitOfWork.CompleteAsync();
+                await _serviceManager.VillaNumberServices.AddAsync(villaNumberVM.VillaNumber);
+                var result = await _serviceManager.CompleteAsync();
 
                 if (!result)
                 {
@@ -90,20 +63,16 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int villaNumberId)
         {
-            var villaNumber = await _villaNumberRepository.GetAsync(V => V.Villa_Number == villaNumberId);
+            var villaNumber = await _serviceManager.VillaNumberServices.GetAsync(villaNumberId);
 
             if (villaNumber is null)
-                return RedirectToAction("Error","Home");
-            var villaList = await _villaRepository.GetAll().ToListAsync();
+                return RedirectToAction("Error", "Home");
+
             VillaNumberVM vm = new VillaNumberVM()
             {
-                VillaNumber = villaNumber,
-                VillaList = villaList.Select(v => new SelectListItem()
-                {
-                    Text = v.Name,
-                    Value = v.Id.ToString()
-                })
+                VillaNumber = villaNumber
             };
+
             return View(vm);
         }
 
@@ -114,10 +83,10 @@ namespace WhiteLagoon.Web.Controllers
             if (!ModelState.IsValid)
                 return View(updatedVillaNumberVM);
 
-            
-           var updated = _villaNumberRepository.Update(updatedVillaNumberVM.VillaNumber);
 
-            var result = await _unitOfWork.CompleteAsync();
+            var updated = _serviceManager.VillaNumberServices.Update(updatedVillaNumberVM.VillaNumber);
+
+            var result = await _serviceManager.CompleteAsync();
 
             if (!result)
             {
@@ -135,19 +104,13 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int villaNumberId)
         {
-            var villaNumber = await _villaNumberRepository.GetAsync(V => V.Villa_Number == villaNumberId);
-            if(villaNumber is null)
-                return RedirectToAction("Error","Home");
+            var villaNumber = await _serviceManager.VillaNumberServices.GetAsync(villaNumberId);
+            if (villaNumber is null)
+                return RedirectToAction("Error", "Home");
 
-            var villaList = await _villaRepository.GetAll().ToListAsync();
             VillaNumberVM vm = new VillaNumberVM()
             {
-                VillaNumber = villaNumber,
-                VillaList = villaList.Select(v => new SelectListItem()
-                {
-                    Text = v.Name,
-                    Value = v.Id.ToString()
-                })
+                VillaNumber = villaNumber
             };
             return View(vm);
         }
@@ -155,24 +118,24 @@ namespace WhiteLagoon.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(VillaNumberVM villaNumberVM)
         {
-            var villaNumber = await _villaNumberRepository.GetAsync(V => V.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
+            var villaNumber = await _serviceManager.VillaNumberServices.GetAsync(villaNumberVM.VillaNumber.Villa_Number);
 
-           if(villaNumber is null)
-                return RedirectToAction("Error","Home");
+            if (villaNumber is null)
+                return RedirectToAction("Error", "Home");
 
-            _villaNumberRepository.Delete(villaNumber);
+            _serviceManager.VillaNumberServices.Delete(villaNumber);
 
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
 
             if (!result)
             {
-                TempData["error"] = "Deleting failed";  
+                TempData["error"] = "Deleting failed";
             }
             else
             {
                 TempData["success"] = "Deleted successfully";
             }
-            
+
             return RedirectToAction("Index");
         }
 

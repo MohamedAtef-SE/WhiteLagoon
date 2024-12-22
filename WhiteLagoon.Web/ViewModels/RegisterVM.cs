@@ -35,6 +35,6 @@ namespace WhiteLagoon.Web.ViewModels
         [ValidateNever]
         public string? ReturnUrl { get; set; }
         [ValidateNever]
-        public IEnumerable<SelectListItem> Roles { get; set; } = null!;
+        public IEnumerable<SelectListItem> Roles { get; set; } = new List<SelectListItem>();
     }
 }

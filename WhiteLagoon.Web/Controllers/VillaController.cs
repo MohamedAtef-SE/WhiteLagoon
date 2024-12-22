@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WhiteLagoon.Application.Interfaces;
+using WhiteLagoon.Application.Services;
+using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Web.Helpers;
 using WhiteLagoon.Web.ViewModels;
@@ -10,24 +10,12 @@ using WhiteLagoon.Web.ViewModels;
 namespace WhiteLagoon.Web.Controllers
 {
     [Authorize]
-    public class VillaController : Controller
+    public class VillaController(IServiceManager _serviceManager, IMapper _mapper) : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;
-        private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IGenericRepository<Villa> _villaRepository;
-        public VillaController(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper, IWebHostEnvironment webHostEnvironment)
-        {
-            _unitOfWork = unitOfWork;
-            _configuration = configuration;
-            _mapper = mapper;
-            _webHostEnvironment = webHostEnvironment;
-            _villaRepository = _unitOfWork.GetGenericRepository<Villa>();
-        }
+        
         public async Task<IActionResult> Index()
         {
-            var villas = await _villaRepository.GetAll().ToListAsync();
+            var villas = await _serviceManager.VillaServices.GetAllAsync();
             
             var mappedVillas = _mapper.Map<IEnumerable<VillaViewModel>>(villas);
 
@@ -58,8 +46,8 @@ namespace WhiteLagoon.Web.Controllers
 
             var mappedVilla = _mapper.Map<Villa>(model);
 
-            await _villaRepository.AddAsync(mappedVilla);
-            var result = await _unitOfWork.CompleteAsync();
+            await _serviceManager.VillaServices.AddAsync(mappedVilla);
+            var result = await _serviceManager.CompleteAsync();
 
             if (!result)
             {
@@ -77,7 +65,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int villaId)
         {
-            var villa = await _villaRepository.GetAsync(V => V.Id == villaId);
+            var villa = await _serviceManager.VillaServices.GetAsync(villaId);
 
             if (villa is null)
                 return RedirectToAction("Error", "Home");
@@ -102,12 +90,11 @@ namespace WhiteLagoon.Web.Controllers
                 model.ImageURL = ImageSettings<Villa>.GetImageURL(model.Image);
             }
            
-
             var mappedVilla = _mapper.Map<Villa>(model);
 
-            _villaRepository.Update(mappedVilla);
+            _serviceManager.VillaServices.Update(mappedVilla);
 
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
 
             if (!result)
             {
@@ -125,7 +112,7 @@ namespace WhiteLagoon.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int villaId)
         {
-            var villa = await _villaRepository.GetAsync(V => V.Id == villaId);
+            var villa = await _serviceManager.VillaServices.GetAsync(villaId);
             if (villa is null)
                 return RedirectToAction("Error", "Home");
 
@@ -137,14 +124,14 @@ namespace WhiteLagoon.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(VillaViewModel model)
         {
-            var villa = await _villaRepository.GetAsync(V => V.Id == model.Id);
+            var villa = await _serviceManager.VillaServices.GetAsync(model.Id);
 
             if (villa is null)
                 return RedirectToAction("Error", "Home");
 
-            _villaRepository.Delete(villa);
+            _serviceManager.VillaServices.Delete(villa);
 
-            var result = await _unitOfWork.CompleteAsync();
+            var result = await _serviceManager.CompleteAsync();
 
             if (!result)
             {

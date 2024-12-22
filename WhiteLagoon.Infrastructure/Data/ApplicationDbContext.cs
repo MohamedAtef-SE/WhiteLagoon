@@ -15,19 +15,19 @@ namespace WhiteLagoon.Infrastructure.Data
         public DbSet<Villa> Villas { get; set; }
         public DbSet<VillaNumber> VillaNumbers { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
-        //public DbSet<ApplicationUser> Users {  get; set; }
         public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Villa Data Seeds
             var Villa01 = new Villa()
             {
                 Id = 1,
                 Name = "Royal Villa",
                 Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                ImageURL = "https://placehold.co/600x400",
+                ImageURL = "Images/Villa/_villa01.jpg",
                 Occupancy = 4,
                 Price = 200,
                 Sqft = 550,
@@ -38,7 +38,7 @@ namespace WhiteLagoon.Infrastructure.Data
                 Id = 2,
                 Name = "Premium Pool Villa",
                 Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                ImageURL = "https://placehold.co/600x401",
+                ImageURL = "Images/Villa/_villa02.jpg",
                 Occupancy = 4,
                 Price = 300,
                 Sqft = 550,
@@ -49,7 +49,7 @@ namespace WhiteLagoon.Infrastructure.Data
                 Id = 3,
                 Name = "Luxury Pool Villa",
                 Description = "Fusce 11 tincidunt maximus leo, sed scelerisque massa auctor sit amet. Donec ex mauris, hendrerit quis nibh ac, efficitur fringilla enim.",
-                ImageURL = "https://placehold.co/600x402",
+                ImageURL = "Images/Villa/_villa03.jpg",
                 Occupancy = 4,
                 Price = 400,
                 Sqft = 750,
@@ -57,7 +57,7 @@ namespace WhiteLagoon.Infrastructure.Data
 
             modelBuilder.Entity<Villa>().HasData(Villa01, Villa02,Villa03);
 
-            // Villa Number Data Seeds
+            //Villa Number Data Seeds
             var VN101 = new VillaNumber()
             {
                 VillaId = 1,
@@ -103,83 +103,70 @@ namespace WhiteLagoon.Infrastructure.Data
                 VillaId = 3,
                 Villa_Number = 303,
             };
+            modelBuilder.Entity<VillaNumber>().HasData(VN101, VN102, VN103, VN201, VN202, VN203, VN301, VN302, VN303);
 
-            modelBuilder.Entity<VillaNumber>().HasData(VN101,VN102,VN103,VN201,VN202,VN203,VN301,VN302,VN303);
-
+           // Amenities DataSeeds
             modelBuilder.Entity<Amenity>().HasData(
               new Amenity
               {
                   Id = 1,
-                  VillaId = 40,
+                  VillaId = 1,
                   Name = "Private Pool"
               }, new Amenity
               {
                   Id = 2,
-                  VillaId = 40,
+                  VillaId = 1,
                   Name = "Microwave"
               }, new Amenity
               {
                   Id = 3,
-                  VillaId = 40,
+                  VillaId = 1,
                   Name = "Private Balcony"
               }, new Amenity
               {
                   Id = 4,
-                  VillaId = 40,
+                  VillaId = 1,
                   Name = "1 king bed and 1 sofa bed"
               },
 
               new Amenity
               {
                   Id = 5,
-                  VillaId = 41,
+                  VillaId = 2,
                   Name = "Private Plunge Pool"
               }, new Amenity
               {
                   Id = 6,
-                  VillaId = 41,
+                  VillaId = 2,
                   Name = "Microwave and Mini Refrigerator"
               }, new Amenity
               {
                   Id = 7,
-                  VillaId = 41,
+                  VillaId = 2,
                   Name = "Private Balcony"
               }, new Amenity
               {
                   Id = 8,
-                  VillaId = 41,
+                  VillaId = 2,
                   Name = "king bed or 2 double beds"
               },
 
               new Amenity
               {
                   Id = 9,
-                  VillaId = 42,
+                  VillaId = 3,
                   Name = "Private Pool"
               }, new Amenity
               {
                   Id = 10,
-                  VillaId = 42,
+                  VillaId = 3,
                   Name = "Jacuzzi"
               }, new Amenity
               {
                   Id = 11,
-                  VillaId = 42,
+                  VillaId = 3,
                   Name = "Private Balcony"
-              }, new Amenity
-              {
-                  Id = 12,
-                  VillaId = 43,
-                  Name = "1 king bed and 1 sofa bed"
-              },
-
-              new Amenity
-              {
-                  Id = 13,
-                  VillaId = 43,
-                  Name = "Private Plunge Pool"
-              }
-              );
+              });
         }
     }
 }

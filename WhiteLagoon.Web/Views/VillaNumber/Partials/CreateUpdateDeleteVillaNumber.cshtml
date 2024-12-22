@@ -1,4 +1,13 @@
 ﻿@model VillaNumberVM
+@inject IVillaServices villaServices
+@{
+    var villaList = await villaServices.GetAllAsync();
+    Model.VillaList = villaList.Select(v => new SelectListItem()
+            {
+                Text = v.Name,
+                Value = v.Id.ToString()
+            });
+}
 
 
 <div class="w-100 card border-0 p-4">
@@ -11,7 +20,7 @@
     </div>
     <div class="card-body border p-4">
         <form method="post" class="row" asp-action="@TempData["Action"]">
-            <div asp-validation-summary="ModelOnly" ></div>
+            <div asp-validation-summary="ModelOnly"></div>
             @if (!TempData["Action"].Equals("Create"))
             {
                 <input asp-for="VillaNumber.Villa_Number" hidden />
@@ -22,7 +31,7 @@
                     <select asp-for="VillaNumber.VillaId" asp-items="@Model.VillaList" class="form-select border shadow">
                         <option disabled selected>--Select Villa--</option>
                     </select>
-                   
+
                     <span asp-validation-for="VillaNumber.VillaId" class="text-danger"></span>
                 </div>
                 <div class="form-floating py-1 col-12">
@@ -35,7 +44,7 @@
                     <label asp-for="VillaNumber.SpecialDetails" class="ms-2"></label>
                     <span asp-validation-for="VillaNumber.SpecialDetails" class="text-danger"></span>
                 </div>
-               
+
                 <div class="row pt-2">
                     <div class="col-6 col-md-3">
                         <button id="btnCreateVilla" type="submit" class="btn btn-success w-100">

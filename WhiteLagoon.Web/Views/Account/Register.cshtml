@@ -1,4 +1,13 @@
-﻿@model RegisterVM
+﻿@using Microsoft.AspNetCore.Identity
+@model RegisterVM
+@inject RoleManager<IdentityRole> roleManager
+@{
+    Model.Roles = roleManager.Roles.Select(role => new SelectListItem()
+            {
+                Text = role.Name,
+                Value = role.Name
+            });
+}
 
 <div class="container pt-5">
     <div class="card shadow border ">

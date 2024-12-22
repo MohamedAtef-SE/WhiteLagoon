@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using WhiteLagoon.Application._Common.Utility;
+﻿using WhiteLagoon.Application.Interfaces;
 
 namespace WhiteLagoon.Web.Extentions
 {
@@ -7,18 +6,11 @@ namespace WhiteLagoon.Web.Extentions
     {
         public async static Task InitializeAsync(this WebApplication app)
         {
-            var scope =  app.Services.CreateAsyncScope();
-            var service = scope.ServiceProvider;
+            using var scope = app.Services.CreateAsyncScope();
+            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
 
-
-            // Initialize Roles Table with Admin & Customer Roles.
-            var roleManager = service.GetRequiredService<RoleManager<IdentityRole>>();
-
-            if (!roleManager.Roles.Any())
-            {
-                await roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
-                await roleManager.CreateAsync(new IdentityRole(SD.Role_Customer));
-            }
+            await dbInitializer.UpdateDataBaseAsync();
+            await dbInitializer.SeedDataAsync();
         }
     }
 }

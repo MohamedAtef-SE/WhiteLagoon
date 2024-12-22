@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WhiteLagoon.Domain.Entities.Identity;
-using WhiteLagoon.Web.DTOs;
 
 namespace WhiteLagoon.Web.ViewModels
 {

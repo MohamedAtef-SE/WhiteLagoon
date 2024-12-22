@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
+using WhiteLagoon.Application;
 using WhiteLagoon.Application.Interfaces;
+using WhiteLagoon.Application.Services.Implementation;
+using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities.Identity;
 using WhiteLagoon.Infrastructure.Data;
 using WhiteLagoon.Infrastructure.Repositories;
@@ -45,6 +48,10 @@ namespace WhiteLagoon.Web
             builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
             builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
             builder.Services.AddScoped<IBookingRepository,BookingRepository>();
+            builder.Services.AddScoped<IDbInitializer,DbInitializer>();
+
+            builder.Services.AddApplicationServices();
+
             StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
             var app = builder.Build();
