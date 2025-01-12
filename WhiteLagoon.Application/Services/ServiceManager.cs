@@ -1,6 +1,6 @@
-﻿using WhiteLagoon.Application.Interfaces;
-using WhiteLagoon.Application.Services.Implementation;
+﻿using WhiteLagoon.Application.Services.Implementation;
 using WhiteLagoon.Application.Services.Interfaces;
+using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Application.Services
 {

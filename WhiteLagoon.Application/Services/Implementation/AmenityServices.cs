@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
+using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Application.Services.Implementation
 {

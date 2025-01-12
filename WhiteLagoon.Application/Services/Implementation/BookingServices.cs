@@ -6,10 +6,10 @@ using Stripe.Checkout;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Domain.Entities.Identity;
+using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Application.Services.Implementation
 {

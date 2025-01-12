@@ -1,4 +1,4 @@
-﻿namespace WhiteLagoon.Application.Interfaces
+﻿namespace WhiteLagoon.Domain.Interfaces
 {
     public interface IUnitOfWork : IAsyncDisposable
     {

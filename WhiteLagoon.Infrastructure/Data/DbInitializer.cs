@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities.Identity;
+using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Infrastructure.Data
 {

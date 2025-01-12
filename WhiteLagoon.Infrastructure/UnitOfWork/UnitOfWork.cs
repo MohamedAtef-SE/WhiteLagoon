@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using WhiteLagoon.Application.Interfaces;
+using WhiteLagoon.Domain.Interfaces;
 using WhiteLagoon.Infrastructure.Data;
 using WhiteLagoon.Infrastructure.Repositories;
 

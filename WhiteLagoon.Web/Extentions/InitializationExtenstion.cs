@@ -1,4 +1,4 @@
-﻿using WhiteLagoon.Application.Interfaces;
+﻿using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Web.Extentions
 {

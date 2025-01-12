@@ -2,10 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using WhiteLagoon.Application._Common.Utility;
 using WhiteLagoon.Application.DTOs;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Domain.Entities.Identity;
+using WhiteLagoon.Domain.Interfaces;
 
 namespace WhiteLagoon.Application.Services.Implementation
 {

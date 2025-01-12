@@ -1,6 +1,6 @@
 ﻿using WhiteLagoon.Domain.Entities;
 
-namespace WhiteLagoon.Application.Interfaces
+namespace WhiteLagoon.Domain.Interfaces
 {
     public interface IBookingRepository : IGenericRepository<Booking>
     {

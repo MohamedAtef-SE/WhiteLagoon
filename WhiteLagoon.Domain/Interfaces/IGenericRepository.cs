@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace WhiteLagoon.Application.Interfaces
+namespace WhiteLagoon.Domain.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {

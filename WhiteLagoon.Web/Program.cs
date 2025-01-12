@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Stripe;
 using WhiteLagoon.Application;
-using WhiteLagoon.Application.Interfaces;
-using WhiteLagoon.Application.Services.Implementation;
-using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities.Identity;
+using WhiteLagoon.Infrastructure;
 using WhiteLagoon.Infrastructure.Data;
-using WhiteLagoon.Infrastructure.Repositories;
-using WhiteLagoon.Infrastructure.UnitOfWork;
 using WhiteLagoon.Web.Extentions;
 using WhiteLagoon.Web.Mapping;
 
@@ -23,12 +18,7 @@ namespace WhiteLagoon.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(o => 
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(o =>
             {
                 o.Password.RequireUppercase = true;
                 o.Password.RequireLowercase = true;
@@ -45,12 +35,9 @@ namespace WhiteLagoon.Web
             });
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-            builder.Services.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
-            builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
-            builder.Services.AddScoped<IBookingRepository,BookingRepository>();
-            builder.Services.AddScoped<IDbInitializer,DbInitializer>();
 
             builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices(builder.Configuration);
 
             StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
@@ -73,7 +60,6 @@ namespace WhiteLagoon.Web
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
             await app.InitializeAsync();
 

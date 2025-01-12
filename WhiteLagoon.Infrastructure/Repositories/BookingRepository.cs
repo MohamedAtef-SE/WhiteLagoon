@@ -1,6 +1,6 @@
 ﻿using WhiteLagoon.Application._Common.Utility;
-using WhiteLagoon.Application.Interfaces;
 using WhiteLagoon.Domain.Entities;
+using WhiteLagoon.Domain.Interfaces;
 using WhiteLagoon.Infrastructure.Data;
 
 namespace WhiteLagoon.Infrastructure.Repositories
