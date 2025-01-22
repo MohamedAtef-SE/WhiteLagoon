@@ -1,0 +1,12 @@
+﻿@model VillaViewModel
+@{
+    TempData["Action"] = "Delete";
+}
+
+<partial name="Partials/UpdateDeletePartialView" model="Model" />
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

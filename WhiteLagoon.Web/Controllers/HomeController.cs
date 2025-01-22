@@ -1,32 +1,50 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WhiteLagoon.Web.Models;
+using WhiteLagoon.Application.Services;
+using WhiteLagoon.Application.Services.Interfaces;
+using WhiteLagoon.Web.ViewModels;
 
 namespace WhiteLagoon.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(IServiceManager _serviceManager) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            _logger = logger;
+            var villas = await _serviceManager.VillaServices.GetAllAsync();
+            if(villas is null)
+                return NotFound();
+
+            var homeViewModel = new HomeViewModel()
+            {
+                Nights = 1,
+                CheckInDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                Villas = villas
+            };
+            return View(homeViewModel);
         }
 
-        public IActionResult Index()
+        [HttpPost]
+        public async Task<IActionResult> GetVillasByDate(DateOnly checkInDate, int nights)
         {
-            return View();
-        }
+            Thread.Sleep(500);
+            var villas = await _serviceManager.VillaServices.GetVillasByDate(checkInDate, nights);
 
-        public IActionResult Privacy()
-        {
-            return View();
+           if(villas is null) return BadRequest();
+
+            HomeViewModel model = new HomeViewModel()
+            {
+                CheckInDate = checkInDate,
+                Nights = nights,
+                Villas = villas
+            };
+            return PartialView("Partial/VillaListPartialView", model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
     }
 }

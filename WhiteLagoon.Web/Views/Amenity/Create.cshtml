@@ -1,0 +1,12 @@
+﻿@model AmenityViewModel
+@{
+    TempData["Action"] = "Create";
+}
+
+<partial name="Partials/CreateUpdateDeleteAmenity" model="Model" />
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
