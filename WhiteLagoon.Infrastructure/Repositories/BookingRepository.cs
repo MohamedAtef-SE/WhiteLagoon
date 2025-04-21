@@ -13,7 +13,7 @@ namespace WhiteLagoon.Infrastructure.Repositories
         {
             _dbContext = dbContext;
         }
-        public void UpdateStatus(int bookingId, string bookingStatus,int villaNumber = 0)
+        public void UpdateStatus(int bookingId, string bookingStatus,int villaNumber)
         {
             var bookingFromDb = _dbContext.Bookings.FirstOrDefault(b => b.Id == bookingId);
             if (bookingFromDb is not null)

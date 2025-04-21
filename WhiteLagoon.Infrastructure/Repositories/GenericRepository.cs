@@ -54,6 +54,7 @@ namespace WhiteLagoon.Infrastructure.Repositories
                 foreach (var property in includeProperties.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
                     query = query.Include(property);
+                    
                 }
 
             }
