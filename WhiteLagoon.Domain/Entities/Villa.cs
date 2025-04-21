@@ -6,7 +6,8 @@ namespace WhiteLagoon.Domain.Entities
     public class Villa
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "looks, you missed your name")]
+
+        [Required(ErrorMessage = "looks, you missed villa's name")]
         [MaxLength(50)]
         public required string Name { get; set; }
         public string? Description { get; set; }

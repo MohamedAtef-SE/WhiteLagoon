@@ -52,9 +52,11 @@
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Booking" asp-action="Index" asp-route-status="@SD.StatusApproved">Manage Booking</a>
-                            </li>
+                            if(User.Identity?.Name is not null){
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Booking" asp-action="Index" asp-route-status="@SD.StatusApproved">Manage Booking</a>
+                                </li>
+                            }
                         }
 
                     </ul>

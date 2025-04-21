@@ -23,12 +23,12 @@ namespace WhiteLagoon.Application.Services.Implementation
 
         public async Task<IEnumerable<Villa>> GetAllAsync()
         {
-            var villas = await _villaRepository.GetAll().ToListAsync();
+            var villas = await _villaRepository.GetAll(includeProperties: "Amenities").ToListAsync();
             return villas;
         }
         public async Task<Villa?> GetAsync(int villaId)
         {
-            return await _villaRepository.GetAsync(V => V.Id == villaId);
+            return await _villaRepository.GetAsync(V => V.Id == villaId,includeProperties: "Amenities");
         }
 
         public async Task<IEnumerable<Villa>?> GetVillasByDate(DateOnly checkInDate, int nights)

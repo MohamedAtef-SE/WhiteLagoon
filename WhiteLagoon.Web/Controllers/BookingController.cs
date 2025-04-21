@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WhiteLagoon.Application._Common.Utility;
 using WhiteLagoon.Application.Services;
-using WhiteLagoon.Application.Services.Interfaces;
 using WhiteLagoon.Domain.Entities;
 using WhiteLagoon.Domain.Entities.Identity;
 

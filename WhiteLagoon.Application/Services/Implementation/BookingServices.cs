@@ -57,10 +57,13 @@ namespace WhiteLagoon.Application.Services.Implementation
             booking.Status = SD.StatusPending;
             booking.BookingDate = DateTime.UtcNow;
 
-            var villasNumber = await _serviceManager.VillaNumberServices.GetAllAsync();
-            var bookedVillas = await _bookingRepository.GetAll(booking => booking.Status == SD.StatusApproved
-                                                                            || booking.Status == SD.StatusCheckedIn).ToListAsync();
-
+            var villasNumber = await _serviceManager.VillaNumberServices.GetAllAsync(vn => vn.VillaId == villa.Id);
+            var bookedVillas =  _bookingRepository.GetAll(booking => (booking.Status == SD.StatusApproved
+                                                                           ||
+                                                                           booking.Status == SD.StatusCheckedIn)
+                                                                           &&
+                                                                           booking.VillaId == villa.Id);
+                                                                           
 
             int roomsAvailable = SD.VillaRoomsAvailable_Count((int)villa.Id, villasNumber.ToList(),
                                                               booking.CheckInDate, booking.Nights,
@@ -140,7 +143,7 @@ namespace WhiteLagoon.Application.Services.Implementation
 
                 if (session.PaymentStatus == "paid")
                 {
-                    _bookingRepository.UpdateStatus(booking.Id, SD.StatusApproved, 0);
+                    _bookingRepository.UpdateStatus(booking.Id, SD.StatusApproved);
                     _bookingRepository.UpdateStripePaymentID(booking.Id, session.Id, session.PaymentIntentId);
                     var result = await _unitOfWork.CompleteAsync();
                     if (!result) return null;
@@ -152,7 +155,7 @@ namespace WhiteLagoon.Application.Services.Implementation
 
         public async Task<Booking?> BookingDetails(int bookingId)
         {
-            Booking? booking = await _bookingRepository.GetAsync(booking => booking.Id == bookingId, includeProperties: "Villa,User");
+            Booking? booking = await _bookingRepository.GetAsync(booking => booking.Id == bookingId, includeProperties: "Villa.Amenities,User");
             if (booking is null)
                 return null;
 

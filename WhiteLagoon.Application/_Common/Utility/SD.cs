@@ -34,7 +34,7 @@ namespace WhiteLagoon.Application._Common.Utility
                         bookingInDate.Add(booking.Id);
                     }
                 }
-
+                
                 var totalAvailableRooms = roomsInVilla - bookingInDate.Count();
                 if (totalAvailableRooms == 0)
                 {

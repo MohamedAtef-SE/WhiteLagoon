@@ -75,9 +75,9 @@
             };
 
             $.ajax({
+                type: "POST",
                 url: "@Url.Action("GetVillasByDate","Home")",
                 data: objData,
-                type: "POST",
                 success: function (data) {
                     $("#VillasList").empty();
                     $("#VillasList").html(data);
